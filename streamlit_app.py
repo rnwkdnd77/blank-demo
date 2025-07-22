@@ -21,7 +21,7 @@ with left_col:
     st.header("기출문제")
     image_file = st.file_uploader("문제 이미지 업로드 (PNG)", type=["png"])
     if image_file:
-        st.image(image_file, use_column_width=True)
+        st.image(image_file, use_container_width=True)
 
 # --- 우측: CSV 업로드 및 정답률 차트 --
 with right_col:
