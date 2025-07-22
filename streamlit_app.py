@@ -23,7 +23,7 @@ with left_col:
     if image_file:
         st.image(image_file, use_column_width=True)
 
-# --- 우측: CSV 업로드 및 정답률 차트 ---
+# --- 우측: CSV 업로드 및 정답률 차트 --
 with right_col:
     st.header("답지응답률")
 
