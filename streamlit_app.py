@@ -61,7 +61,7 @@ if csv_file:
     if len(df) < 2:
         st.warning("CSV 파일에 최소 2행이 필요합니다.")
     else:
-        col1, col2 = st.columns([1, 1])  # 좌우 50% 비율
+        col1, col2 = st.columns([1,1.5])  # 좌우 50% 비율
 
         # ✅ 왼쪽: 6열 × 3행 버튼
         with col1:
