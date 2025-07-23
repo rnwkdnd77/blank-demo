@@ -10,7 +10,7 @@ plt.rcParams['axes.unicode_minus'] = False
 
 # 페이지 설정
 st.set_page_config(layout="wide")
-st.title("1학기 기말 수학1 답지응답률 분석")
+st.title("1학기 기말 수학1 정답률 분석")
 
 # ✅ 사용자 정의 CSS
 st.markdown("""
@@ -18,10 +18,10 @@ st.markdown("""
 /* 버튼 크기, 글자 크기 축소 */
 .stButton>button {
     width: 100%;
-    height: 30px;  /* 50% 축소 */
-    font-size: 9px; /* 50% 축소 */
+    height: 20px;  /* 50% 축소 */
+    font-size: 7px; /* 50% 축소 */
     padding: 2px 4px;
-    margin: 2px;
+    margin: 1px;
 }
 
 /* 선택된 버튼 강조 */
@@ -44,14 +44,14 @@ if 'selected_row' not in st.session_state:
 # 좌측 이미지 업로드
 left_upload, right_upload = st.columns(2)
 with left_upload:
-    st.header("기출문제")
-    image_file = st.file_uploader("문제 이미지 업로드 (PNG)", type=["png"])
+    st.header("문제선택")
+    image_file = st.file_uploader("문제 업로드 (PNG)", type=["png"])
     if image_file:
         st.image(image_file, use_container_width=True)
 
 # 우측 CSV 업로드 및 버튼 표시
 with right_upload:
-    st.header("답지응답률")
+    st.header("정답률")
     csv_file = st.file_uploader("CSV 파일 업로드", type=["csv"])
 
 # ✅ 버튼과 차트를 좌우 50% 영역으로 나누기
