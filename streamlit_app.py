@@ -12,29 +12,17 @@ plt.rcParams['axes.unicode_minus'] = False
 st.set_page_config(layout="wide")
 st.title("1학기 기말 수학1 답지응답률 분석")
 
-# ✅ 사용자 정의 CSS (반응형 버튼 + hover + 선택 강조)
+# ✅ 사용자 정의 CSS (선택된 버튼 강조 + hover 효과)
 st.markdown("""
 <style>
-.button-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-    margin-bottom: 1rem;
-}
-.button-grid > div {
-    flex: 1 0 28%;
-    min-width: 90px;
-    max-width: 150px;
-}
 .stButton>button {
     width: 100%;
     height: 60px;
     font-size: 18px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease-in-out;
 }
 .stButton>button:hover {
-    background-color: #e0e0e0;
+    background-color: #f0f0f0;
     color: black;
 }
 .selected-button > button {
@@ -43,6 +31,10 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
+
+# ✅ session state 초기화
+if 'selected_row' not in st.session_state:
+    st.session_state.selected_row = None
 
 # 좌우 레이아웃
 left_col, right_col = st.columns(2)
@@ -54,7 +46,7 @@ with left_col:
     if image_file:
         st.image(image_file, use_container_width=True)
 
-# --- 우측: CSV 업로드 및 정답률 차트 ---
+# --- 우측: CSV 업로드 및 버튼 표시 ---
 with right_col:
     st.header("답지응답률")
     csv_file = st.file_uploader("CSV 파일 업로드", type=["csv"])
@@ -65,36 +57,39 @@ with right_col:
         if len(df) < 2:
             st.warning("CSV 파일에 최소 2행이 필요합니다.")
         else:
-            if 'selected_row' not in st.session_state:
-                st.session_state.selected_row = None
+            st.markdown("#### 문항 선택")
 
-            # ✅ 버튼 표시 (예: 1번 ~ 30번)
-            st.markdown('<div class="button-grid">', unsafe_allow_html=True)
-            for i in range(1, min(51, len(df))):  # 최대 50개까지 생성 가능
-                css_class = "selected-button" if st.session_state.selected_row == i else ""
-                st.markdown(f'<div class="{css_class}">', unsafe_allow_html=True)
-                if st.button(f"{i}번\n보기", key=f"btn_{i}"):
-                    st.session_state.selected_row = i
-                st.markdown("</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            # ✅ 버튼을 6열 × 3행 (18개까지)로 고정 정렬
+            total_buttons = min(18, len(df) - 1)
+            cols = st.columns(6)
 
-            # ✅ 선택된 차트 표시
-            if st.session_state.selected_row:
-                row_index = st.session_state.selected_row
-                if row_index >= len(df):
-                    st.warning(f"{row_index}번 데이터가 없습니다.")
-                else:
-                    labels = df.iloc[0, :].astype(str)
-                    data = df.iloc[row_index, :].astype(float)
+            for i in range(1, total_buttons + 1):
+                col = cols[(i - 1) % 6]
+                with col:
+                    btn_class = "selected-button" if st.session_state.selected_row == i else ""
+                    st.markdown(f'<div class="{btn_class}">', unsafe_allow_html=True)
+                    if st.button(f"{i}번\n보기", key=f"btn_{i}"):
+                        st.session_state.selected_row = i
+                    st.markdown("</div>", unsafe_allow_html=True)
 
-                    fig, ax = plt.subplots(figsize=(10, 5))
-                    ax.bar(labels, data, color='skyblue')
-                    ax.set_ylim(0, 100)
-                    ax.set_ylabel("정답률 (%)", fontproperties=nanum_font)
-                    ax.set_title(f"{row_index}번 문항 정답률", fontproperties=nanum_font)
-                    ax.set_xticklabels(labels, fontproperties=nanum_font)
+# ✅ 버튼과 같은 레벨에서 차트를 바로 표시
+if csv_file and st.session_state.selected_row:
+    row_index = st.session_state.selected_row
 
-                    for label in ax.get_xticklabels() + ax.get_yticklabels():
-                        label.set_fontproperties(nanum_font)
+    if row_index >= len(df):
+        st.warning(f"{row_index}번 데이터가 없습니다.")
+    else:
+        labels = df.iloc[0, :].astype(str)
+        data = df.iloc[row_index, :].astype(float)
 
-                    st.pyplot(fig)
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.bar(labels, data, color='skyblue')
+        ax.set_ylim(0, 100)
+        ax.set_ylabel("정답률 (%)", fontproperties=nanum_font)
+        ax.set_title(f"{row_index}번 문항 정답률", fontproperties=nanum_font)
+        ax.set_xticklabels(labels, fontproperties=nanum_font)
+
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontproperties(nanum_font)
+
+        st.pyplot(fig)
